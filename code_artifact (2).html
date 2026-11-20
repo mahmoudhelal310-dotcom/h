@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>منصة فيت إنفست - استثمار وشراء الأجهزة الرياضية</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+    }
+    .dir-ltr {
+      direction: ltr;
+    }
+    .fade-in {
+      animation: fadeIn 0.25s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white">
+
+  <!-- حاوية الإشعارات التفاعلية (Toast Notifications) -->
+  <div id="toast-container" class="fixed bottom-4 left-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- ==================== 1. واجهة المستخدم المستقلة (ROUTE: #/) ==================== -->
+  <div id="route-user-app" class="flex-1 flex flex-col">
+
+    <!-- شريط التنقل العلوي الخاص بالمستخدم فقط (نظيف تماماً بدون أي أزرار أدمن) -->
+    <header class="sticky top-0 z-40 bg-slate-900 text-white shadow-lg border-b border-slate-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-wrap items-center justify-between py-3 gap-3">
+          
+          <!-- الشعار -->
+          <div class="flex items-center gap-3 cursor-pointer" onclick="switchUserTab('store')">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-md shadow-emerald-500/20">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.5 6.5v11M17.5 6.5v11M3 8.5v7M21 8.5v7M6.5 12h11" />
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-lg sm:text-xl font-extrabold tracking-tight flex items-center gap-1.5">
+                <span>فيت إنفست</span>
+                <span class="text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full">10% يومياً</span>
+              </h1>
+              <p class="text-[11px] text-slate-400 hidden sm:block">تملّك الأجهزة الرياضية وحقق عائداً يومياً</p>
+            </div>
+          </div>
+
+          <!-- روابط التنقل الرئيسية للمستخدم -->
+          <nav class="flex items-center gap-1.5 sm:gap-2 bg-slate-800/80 p-1 rounded-xl border border-slate-700/80">
+            <button id="tab-btn-store" onclick="switchUserTab('store')" class="px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-all bg-emerald-500 text-white shadow">
+              🏋️ المتجر
+            </button>
+            <button id="tab-btn-orders" onclick="switchUserTab('orders')" class="px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-all text-slate-300 hover:text-white flex items-center gap-1.5">
+              <span>📊 طلباتي وأرباحي</span>
+              <span id="user-orders-count" class="bg-slate-700 text-slate-200 text-[11px] px-2 py-0.2 rounded-full">0</span>
+            </button>
+          </nav>
+
+          <!-- حالة تسجيل الدخول / الحساب -->
+          <div id="auth-header-area" class="flex items-center gap-2">
+            <!-- يتم تعبئتها ديناميكياً عبر JS -->
+          </div>
+
+        </div>
+      </div>
+    </header>
+
+    <!-- المحتوى الرئيسي للمستخدم -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <section id="view-user" class="fade-in space-y-8">
+
+        <!-- قسم المتجر (STORE TAB) -->
+        <div id="user-tab-store" class="space-y-6">
+          
+          <!-- بانر ترحيبي وتوضيحي -->
+          <div class="relative overflow-hidden rounded-3xl bg-gradient-to-l from-slate-900 via-slate-800 to-emerald-950 text-white p-6 sm:p-10 shadow-xl border border-slate-800">
+            <div class="relative z-10 max-w-2xl space-y-4">
+              <div class="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 px-3 py-1 rounded-full text-xs font-bold">
+                <span>⚡ تفعيل سريع خلال 3 ساعات من التحويل</span>
+              </div>
+              <h2 class="text-2xl sm:text-4xl font-black leading-tight">
+                اشترِ جهازك الرياضي واحصل على <span class="text-emerald-400">عائد يومي 10%</span>
+              </h2>
+              <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                اختر الجهاز المناسب من تشكيلتنا الاحترافية، حوّل قيمة الجهاز بسهولة عبر المحافظ الإلكترونية أو إنستاباي، وارفع صورة التحويل ليتم تفعيل أرباحك اليومية فوراً بعد المراجعة.
+              </p>
+              <div class="flex flex-wrap items-center gap-3 pt-2">
+                <button onclick="scrollToProducts()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-emerald-500/25 transition-all text-sm sm:text-base">
+                  استكشف الأجهزة الآن
+                </button>
+                <button onclick="switchUserTab('orders')" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-5 py-3 rounded-xl border border-white/15 transition-all text-sm sm:text-base">
+                  متابعة طلباتي وأرباحي
+                </button>
+              </div>
+            </div>
+
+            <!-- تنبيه الشفافية وشروط العائد -->
+            <div class="relative z-10 mt-6 pt-4 border-t border-white/10 flex items-start gap-2.5 text-xs text-amber-200/90">
+              <svg class="w-5 h-5 text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p>
+                <strong>تنبيه شفافية وشروط العائد:</strong> يُحتسب العائد اليومي بنسبة <strong>10% من قيمة الجهاز الأساسية</strong> لمدة دورة استثمارية تبدأ فور مراجعة واعتماد إيصال التحويل من الإدارة (بحد أقصى 3 ساعات).
+              </p>
+            </div>
+          </div>
+
+          <!-- عنوان الكتالوج -->
+          <div id="products-section" class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2">
+            <div>
+              <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900">الأجهزة الرياضية المتاحة</h3>
+              <p class="text-sm text-slate-500">اختر الجهاز واضغط على "شراء الآن" لإتمام التحويل وتفعيل الربح اليومي</p>
+            </div>
+            <div class="text-xs font-semibold text-slate-600 bg-white px-3.5 py-2 rounded-xl border border-slate-200 shadow-sm self-start sm:self-auto">
+              رقم محفظة الاستلام الحالي: <span id="display-wallet-banner" class="font-bold text-emerald-700 dir-ltr">01098765432</span>
+            </div>
+          </div>
+
+          <!-- شبكة المنتجات الرياضية -->
+          <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- يتم حقن البطاقات عبر JavaScript -->
+          </div>
+
+        </div>
+
+        <!-- قسم طلباتي وأرباحي (MY ORDERS & PROFITS TAB) -->
+        <div id="user-tab-orders" class="hidden space-y-6 fade-in">
+          
+          <!-- شريط علوي مع زر محاكاة مرور يوم -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div>
+              <h3 class="text-xl font-extrabold text-slate-900">محفظتي وطلبات الشراء</h3>
+              <p class="text-sm text-slate-500">تابع حالة مراجعة التحويلات (مهلة 3 ساعات) وأرباحك اليومية وسجل المعاملات</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <button onclick="simulateDayPassed()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold px-4 py-2.5 rounded-xl shadow-sm transition-all text-xs sm:text-sm flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>محاكاة مرور يوم (إضافة ربح 10%)</span>
+              </button>
+              <button onclick="requestWithdrawDemo()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2.5 rounded-xl transition-all text-xs sm:text-sm">
+                سحب الأرباح
+              </button>
+            </div>
+          </div>
+
+          <!-- بطاقات الملخص المالي للمستخدم -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-xs font-bold text-slate-500 mb-1">الرصيد القابل للسحب</p>
+                <p class="text-2xl sm:text-3xl font-black text-emerald-600"><span id="stat-user-balance">0</span> <span class="text-sm font-bold">ج.م</span></p>
+                <p class="text-[11px] text-slate-400 mt-1">أرباح يومية محققة بالفعل</p>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-xs font-bold text-slate-500 mb-1">الربح اليومي المتوقع (10%)</p>
+                <p class="text-2xl sm:text-3xl font-black text-amber-500"><span id="stat-user-daily">0</span> <span class="text-sm font-bold">ج.م / يوم</span></p>
+                <p class="text-[11px] text-slate-400 mt-1">من الأجهزة النشطة حالياً</p>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-xs font-bold text-slate-500 mb-1">الأجهزة النشطة والمعلقة</p>
+                <p class="text-2xl sm:text-3xl font-black text-slate-800"><span id="stat-user-active-count">0</span> <span class="text-sm font-bold text-slate-500">نشط</span></p>
+                <p class="text-[11px] text-slate-400 mt-1" id="stat-user-pending-text">0 طلبات قيد المراجعة</p>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- قائمة طلبات المستخدم -->
+          <div class="space-y-3">
+            <h4 class="text-base font-extrabold text-slate-800">طلبات الشراء الخاصة بك</h4>
+            <div id="user-orders-list" class="space-y-4">
+              <!-- يتم تعبئتها ديناميكياً -->
+            </div>
+          </div>
+
+          <!-- سجل المعاملات والأرباح اليومية -->
+          <div id="user-transactions-section" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
+              <h4 class="text-base font-extrabold text-slate-800">سجل الأرباح والمعاملات المالية</h4>
+              <span class="text-xs text-slate-400">أحدث العمليات</span>
+            </div>
+            <div id="user-transactions-list" class="divide-y divide-slate-100">
+              <!-- يتم تعبئتها ديناميكياً -->
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </main>
+
+    <!-- تذييل الصفحة مع رابط دخول الإدارة المخفي في الأسفل -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p>© 2026 منصة فيت إنفست (FitInvest) - جميع الحقوق محفوظة.</p>
+        <div class="flex items-center gap-4">
+          <span class="text-slate-500">خدمة العملاء متاحة على مدار الساعة</span>
+          <a href="#/admin" onclick="navigateTo('/admin'); return false;" class="text-slate-600 hover:text-slate-400 transition-colors underline decoration-slate-700">
+            دخول الإدارة
+          </a>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ==================== 2. مسار وصفحة لوحة تحكم الأدمن المستقلة (ROUTE: #/admin) ==================== -->
+  <div id="route-admin-app" class="hidden min-h-screen flex-1 flex flex-col bg-slate-950 text-slate-100">
+
+    <!-- شريط علوي إداري مستقل تماماً -->
+    <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur border-b border-slate-800 shadow-xl">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-black shadow-lg shadow-amber-500/20">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-base sm:text-lg font-black text-white">FitInvest Admin Portal</h1>
+              <span class="text-[10px] font-extrabold bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-full">مسار الإدارة المستقل</span>
+            </div>
+            <p class="text-[11px] text-slate-400">نظام مراجعة التحويلات وإدارة العوائد اليومية والمنتجات</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <a href="#/" onclick="navigateTo('/'); return false;" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold px-3.5 py-2 rounded-xl transition-all">
+            العودة لموقع المستخدمين ↗
+          </a>
+          <button id="admin-logout-btn" onclick="logoutAdmin()" class="hidden bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 text-xs font-bold px-3.5 py-2 rounded-xl transition-all">
+            تسجيل خروج الإدارة
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- شاشة تسجيل الدخول الإداري (ADMIN LOGIN GATE) -->
+    <section id="admin-login-screen" class="flex-1 flex items-center justify-center p-4 fade-in">
+      <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+        <div class="text-center space-y-2">
+          <div class="w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-black text-white">تسجيل دخول الإدارة</h2>
+          <p class="text-xs text-slate-400">هذه المنطقة مخصصة لمسؤولي مراجعة التحويلات وإدارة النظام فقط</p>
+        </div>
+
+        <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">اسم المستخدم الإداري</label>
+            <input type="text" id="admin-login-user" required class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm font-bold focus:outline-none focus:border-amber-500" placeholder="admin" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">كلمة المرور</label>
+            <input type="password" id="admin-login-pass" required class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm font-bold focus:outline-none focus:border-amber-500" placeholder="••••••" />
+          </div>
+
+          <!-- تلميح بيانات الدخول التجريبية -->
+          <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-3 text-[11px] text-slate-400 flex items-center justify-between">
+            <span>بيانات الدخول التجريبية للاختبار:</span>
+            <span class="font-mono font-bold text-amber-400 dir-ltr">admin / 123456</span>
+          </div>
+
+          <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3.5 rounded-xl shadow-lg shadow-amber-500/20 transition-all text-sm">
+            دخول لوحة التحكم
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- محتوى لوحة تحكم الأدمن بعد تسجيل الدخول (ADMIN DASHBOARD CONTENT) -->
+    <main id="admin-dashboard-content" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8 fade-in">
+      
+      <!-- إحصائيات الأدمن الشاملة (4 بطاقات) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-lg">
+          <p class="text-xs font-bold text-slate-400">إجمالي الإيداعات المقبولة</p>
+          <p class="text-2xl sm:text-3xl font-black text-white mt-1.5"><span id="admin-stat-total">0</span> <span class="text-xs font-bold text-slate-400">ج.م</span></p>
+          <p class="text-[11px] text-emerald-400 mt-1">مبالغ معتمدة بالكامل</p>
+        </div>
+
+        <div class="bg-slate-900 p-5 rounded-2xl border border-amber-500/30 shadow-lg">
+          <p class="text-xs font-bold text-amber-400">طلبات معلقة (مهلة 3 ساعات)</p>
+          <p class="text-2xl sm:text-3xl font-black text-amber-400 mt-1.5"><span id="admin-stat-pending">0</span> <span class="text-xs font-bold">طلب</span></p>
+          <p class="text-[11px] text-slate-400 mt-1">بانتظار مراجعة الإيصال</p>
+        </div>
+
+        <div class="bg-slate-900 p-5 rounded-2xl border border-emerald-500/30 shadow-lg">
+          <p class="text-xs font-bold text-emerald-400">إجمالي الأرباح اليومية الموزعة</p>
+          <p class="text-2xl sm:text-3xl font-black text-emerald-400 mt-1.5"><span id="admin-stat-distributed">0</span> <span class="text-xs font-bold">ج.م</span></p>
+          <p class="text-[11px] text-slate-400 mt-1">عوائد 10% مضافة للعملاء</p>
+        </div>
+
+        <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-lg">
+          <p class="text-xs font-bold text-slate-400">عدد المستخدمين النشطين</p>
+          <p class="text-2xl sm:text-3xl font-black text-sky-400 mt-1.5"><span id="admin-stat-users">0</span> <span class="text-xs font-bold text-slate-400">مستخدم</span></p>
+          <p class="text-[11px] text-slate-400 mt-1">مسجلين برقم الموبايل</p>
+        </div>
+      </div>
+
+      <!-- قسم مراجعة التحويلات -->
+      <div class="bg-slate-900 rounded-3xl border border-slate-800 shadow-xl overflow-hidden">
+        <div class="p-5 sm:p-6 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-lg font-extrabold text-white">إدارة ومراجعة التحويلات المالية</h3>
+            <p class="text-xs text-slate-400">راجع صورة إيصال التحويل، وتأكد من المبلغ، ثم اعتمد الطلب لتفعيل الربح اليومي 10%</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="admin-filter-status" onchange="renderAdminOrders()" class="bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-200 focus:outline-none focus:border-amber-500">
+              <option value="all">جميع الطلبات</option>
+              <option value="pending">قيد المراجعة فقط</option>
+              <option value="active">المقبولة / النشطة</option>
+              <option value="rejected">المرفوضة</option>
+            </select>
+          </div>
+        </div>
+        <div id="admin-orders-container" class="divide-y divide-slate-800">
+          <!-- يتم تعبئتها ديناميكياً -->
+        </div>
+      </div>
+
+      <!-- إدارة محافظ الاستلام وإدارة الأجهزة الرياضية -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- تحديث رقم محفظة الاستلام (5 أعمدة) -->
+        <div class="lg:col-span-5 bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-xl space-y-4 self-start">
+          <h3 class="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+            <span>📱 إدارة رقم محفظة الاستلام</span>
+          </h3>
+          <p class="text-xs text-slate-400">يظهر هذا الرقم فوراً للمستخدمين في المتجر ونافذة الدفع عند شراء أي جهاز.</p>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">رقم الموبايل / المحفظة</label>
+              <input type="text" id="admin-wallet-number" class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm font-bold focus:outline-none focus:border-amber-500 dir-ltr text-right" placeholder="01098765432" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">وسيلة التحويل / اسم الحساب</label>
+              <input type="text" id="admin-wallet-label" class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500" placeholder="فودافون كاش / إنستاباي" />
+            </div>
+            <button onclick="saveWalletSettings()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2.5 rounded-xl text-sm transition-all">
+              حفظ وتحديث رقم المحفظة
+            </button>
+          </div>
+        </div>
+
+        <!-- إدارة الأجهزة الرياضية: إضافة وتعديل وحذف (7 أعمدة) -->
+        <div class="lg:col-span-7 bg-slate-900 p-6 rounded-3xl border border-slate-800 shadow-xl space-y-5">
+          <div class="flex items-center justify-between">
+            <h3 class="text-base sm:text-lg font-extrabold text-white" id="admin-product-form-title">➕ إضافة جهاز رياضي جديد</h3>
+            <button type="button" id="admin-cancel-edit-btn" onclick="cancelEditProduct()" class="hidden text-xs text-amber-400 hover:underline font-bold">
+              إلغاء التعديل
+            </button>
+          </div>
+
+          <form onsubmit="handleSaveProduct(event)" class="space-y-3 bg-slate-950/60 p-4 rounded-2xl border border-slate-800">
+            <input type="hidden" id="edit-prod-id" value="" />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">اسم الجهاز الرياضي</label>
+                <input type="text" id="new-prod-name" required class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-500" placeholder="مثال: جهاز أوبتيكال منزلي" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">السعر (بالجنيه المصري)</label>
+                <input type="number" id="new-prod-price" min="100" required class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm font-bold focus:outline-none focus:border-emerald-500" placeholder="4500" />
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">مدة العائد اليومي 10% (بالأيام)</label>
+                <input type="number" id="new-prod-days" min="1" value="30" required class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm font-bold focus:outline-none focus:border-emerald-500" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-300 mb-1">نوع أيقونة الجهاز</label>
+                <select id="new-prod-icon" class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-500">
+                  <option value="treadmill">مشاية كهربائية</option>
+                  <option value="bike">دراجة سبينينج</option>
+                  <option value="multigym">مالتي جيم / أوزان</option>
+                  <option value="rowing">جهاز تجديف رياضي</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">وصف مختصر للجهاز</label>
+              <input type="text" id="new-prod-desc" required class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-500" placeholder="مواصفات احترافية وعائد يومي ثابت 10%" />
+            </div>
+            <button type="submit" id="admin-product-submit-btn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-sm transition-all">
+              إضافة الجهاز للمتجر
+            </button>
+          </form>
+
+          <!-- قائمة الأجهزة الحالية للتعديل أو الحذف -->
+          <div class="space-y-2">
+            <h4 class="text-xs font-bold text-slate-400">الأجهزة المعروضة حالياً في المتجر (<span id="admin-products-count">0</span>)</h4>
+            <div id="admin-products-list" class="divide-y divide-slate-800 border border-slate-800 rounded-2xl overflow-hidden bg-slate-950/40">
+              <!-- يتم تعبئتها ديناميكياً -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ==================== نافذة تسجيل الدخول برقم الموبايل (OTP MODAL) ==================== -->
+  <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-5 fade-in">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg sm:text-xl font-black text-slate-900">تسجيل الدخول برقم الموبايل</h3>
+        <button onclick="closeAuthModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold">✕</button>
+      </div>
+
+      <!-- الخطوة 1: إدخال رقم الهاتف -->
+      <form id="auth-step-phone" onsubmit="handleSendOtp(event)" class="space-y-4">
+        <p class="text-xs sm:text-sm text-slate-500">أدخل رقم موبايلك لتسجيل الدخول أو إنشاء حساب جديد تلقائياً عبر رمز التحقق (OTP).</p>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">رقم الموبايل (مصر)</label>
+          <input type="tel" id="login-phone-input" required placeholder="01012345678" maxlength="11" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-slate-900 font-bold text-base focus:outline-none focus:border-emerald-500 dir-ltr text-right" />
+        </div>
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3.5 rounded-xl shadow-lg shadow-emerald-600/20 transition-all text-sm">
+          إرسال رمز التحقق (OTP)
+        </button>
+      </form>
+
+      <!-- الخطوة 2: إدخال كود التحقق -->
+      <form id="auth-step-otp" onsubmit="handleVerifyOtp(event)" class="hidden space-y-4">
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 text-xs text-emerald-900 space-y-1">
+          <p>تم إرسال رمز التحقق إلى الرقم: <strong id="otp-phone-display" class="dir-ltr"></strong></p>
+          <p class="text-emerald-700">رمز التحقق التجريبي للاختبار: <span id="demo-otp-code" class="font-mono font-black bg-white px-2 py-0.5 rounded border border-emerald-300 text-sm">1234</span></p>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">أدخل رمز التحقق المكون من 4 أرقام</label>
+          <input type="text" id="login-otp-input" required maxlength="4" placeholder="••••" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-center font-mono text-2xl font-black tracking-widest focus:outline-none focus:border-emerald-500" />
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="resetAuthStep()" class="px-4 py-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs">
+            تغيير الرقم
+          </button>
+          <button type="submit" class="flex-1 bg-slate-900 hover:bg-emerald-600 text-white font-extrabold py-3.5 rounded-xl transition-all text-sm">
+            تأكيد الدخول
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== نافذة الدفع ورفع إثبات التحويل (CHECKOUT MODAL) ==================== -->
+  <div id="checkout-modal" class="fixed inset-0 z-50 hidden bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5 my-auto fade-in">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">طلب رقم: <span id="checkout-order-id">#ORD</span></span>
+          <h3 id="checkout-product-name" class="text-lg font-black text-slate-900 mt-1">اسم الجهاز</h3>
+        </div>
+        <button onclick="closeCheckoutModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold">✕</button>
+      </div>
+
+      <!-- ملخص المبلغ والربح -->
+      <div class="grid grid-cols-2 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+        <div>
+          <p class="text-[11px] font-bold text-slate-500">المبلغ المطلوب تحويله</p>
+          <p id="checkout-product-price" class="text-xl font-black text-slate-900">0 ج.م</p>
+        </div>
+        <div class="text-left">
+          <p class="text-[11px] font-bold text-slate-500">الربح اليومي (10%)</p>
+          <p id="checkout-daily-profit" class="text-base font-black text-emerald-600">+0 ج.م / يوم</p>
+        </div>
+      </div>
+
+      <!-- بيانات رقم المحفظة للتحويل -->
+      <div class="bg-slate-900 text-white p-4 rounded-2xl space-y-2">
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span>حوّل المبلغ إلى الرقم التالي:</span>
+          <span id="checkout-wallet-label" class="text-amber-400 font-bold">فودافون كاش / إنستاباي</span>
+        </div>
+        <div class="flex items-center justify-between gap-2 bg-slate-800 p-3 rounded-xl border border-slate-700">
+          <span id="checkout-wallet-number" class="text-lg sm:text-xl font-mono font-black tracking-wider text-emerald-400 dir-ltr">01098765432</span>
+          <button type="button" onclick="copyWalletNumber()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors">
+            نسخ الرقم
+          </button>
+        </div>
+      </div>
+
+      <!-- نموذج رفع لقطة الشاشة -->
+      <form onsubmit="handleConfirmPurchase(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">رقم العملية / المرجع (اختياري)</label>
+          <input type="text" id="checkout-ref-number" placeholder="مثال: 948271 أو رقم المحفظة المحول منها" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-emerald-500" />
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold text-slate-700">ارفع لقطة شاشة (Screenshot) للتحويل *</label>
+            <button type="button" onclick="useDemoReceiptImage()" class="text-[11px] font-bold text-emerald-600 hover:underline">
+              استخدام صورة إيصال تجريبية جاهزة
+            </button>
+          </div>
+
+          <label for="screenshot-file-input" class="block border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-2xl p-4 text-center cursor-pointer transition-colors bg-slate-50/70">
+            <div id="upload-placeholder" class="space-y-1 py-2">
+              <p class="text-xs font-bold text-slate-700">اضغط هنا لاختيار صورة إيصال التحويل من جهازك</p>
+              <p class="text-[11px] text-slate-400">PNG, JPG, WEBP</p>
+            </div>
+            <div id="upload-preview-wrapper" class="hidden space-y-2">
+              <img id="screenshot-preview-img" src="" alt="معاينة الإيصال" class="max-h-36 mx-auto rounded-xl shadow border border-slate-200" />
+              <p class="text-[11px] font-bold text-emerald-600">تم إرفاق الصورة بنجاح (اضغط لتغييرها)</p>
+            </div>
+            <input type="file" id="screenshot-file-input" accept="image/*" onchange="handleScreenshotUpload(event)" class="hidden" />
+          </label>
+        </div>
+
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-3.5 rounded-xl shadow-lg shadow-emerald-600/20 transition-all text-sm">
+          تأكيد الشراء وإرسال للمراجعة (خلال 3 ساعات)
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== نافذة معاينة صورة الإيصال للأدمن والمستخدم (IMAGE LIGHTBOX) ==================== -->
+  <div id="image-modal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4" onclick="closeImageModal()">
+    <div class="max-w-xl w-full bg-slate-900 rounded-3xl p-4 border border-slate-700 shadow-2xl space-y-3" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between text-white px-2">
+        <h4 class="text-sm font-bold">معاينة لقطة شاشة التحويل</h4>
+        <button onclick="closeImageModal()" class="text-slate-400 hover:text-white text-sm font-bold px-2 py-1 rounded-lg bg-slate-800">إغلاق ✕</button>
+      </div>
+      <div class="rounded-2xl overflow-hidden bg-black flex items-center justify-center max-h-[75vh]">
+        <img id="modal-full-image" src="" alt="إيصال التحويل" class="max-h-[75vh] w-auto object-contain" />
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== نافذة رفض الطلب مع كتابة سبب (REJECT REASON MODAL) ==================== -->
+  <div id="reject-modal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-slate-900 text-white rounded-3xl p-6 border border-slate-700 shadow-2xl space-y-4 fade-in">
+      <div class="flex items-center justify-between">
+        <h4 class="text-base font-black text-rose-400">رفض طلب التحويل <span id="reject-modal-order-id" class="text-white">#ORD</span></h4>
+        <button onclick="closeRejectModal()" class="text-slate-400 hover:text-white text-sm">✕</button>
+      </div>
+      <p class="text-xs text-slate-400">اكتب سبب الرفض ليظهر للعميل في صفحة طلباته (مثال: صورة الإيصال غير واضحة أو المبلغ غير مطابق).</p>
+      <div>
+        <textarea id="reject-reason-input" rows="3" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-white text-sm focus:outline-none focus:border-rose-500" placeholder="اكتب سبب الرفض هنا..."></textarea>
+      </div>
+      <div class="flex items-center justify-end gap-2">
+        <button type="button" onclick="closeRejectModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300">إلغاء</button>
+        <button type="button" onclick="confirmRejectOrder()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-extrabold text-white">تأكيد الرفض</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== السكربت والمنطق البرمجي الكامل ==================== -->
+  <script>
+    // مفاتيح التخزين المحلي في المتصفح (LocalStorage) للمزامنة بين الصفحتين
+    const STORAGE_KEYS = {
+      USER: 'fitinvest_current_user',
+      ADMIN_SESSION: 'fitinvest_admin_authenticated',
+      PRODUCTS: 'fitinvest_products_v1',
+      ORDERS: 'fitinvest_orders_v1',
+      WALLET: 'fitinvest_wallet_v1',
+      BALANCE_MAP: 'fitinvest_balances_v1',
+      TRANSACTIONS: 'fitinvest_transactions_v1'
+    };
+
+    // بيانات الدخول الإدارية التجريبية
+    const ADMIN_CREDENTIALS = {
+      username: 'admin',
+      password: '123456'
+    };
+
+    // مهلة المراجعة: 3 ساعات بالملي ثانية
+    const REVIEW_DURATION_MS = 3 * 60 * 60 * 1000;
+
+    // المنتجات الافتراضية عالية الجودة
+    const DEFAULT_PRODUCTS = [
+      {
+        id: 'prod-1',
+        name: 'مشاية كهربائية برو 5000',
+        price: 5000,
+        dailyRate: 0.10,
+        durationDays: 30,
+        iconType: 'treadmill',
+        desc: 'محرك قوي 3.5 حصان مع شاشة ذكية لقياس النبض والسعرات، مثالية للاستخدام المنزلي والتجاري.'
+      },
+      {
+        id: 'prod-2',
+        name: 'دراجة سبينينج رياضية X-Pro',
+        price: 3000,
+        dailyRate: 0.10,
+        durationDays: 30,
+        iconType: 'bike',
+        desc: 'تصميم انسيابي مقاوم للاهتزاز مع مستويات مقاومة متعددة لتمارين الكارديو عالية الكفاءة.'
+      },
+      {
+        id: 'prod-3',
+        name: 'جهاز مالتي جيم منزلي متكامل',
+        price: 8000,
+        dailyRate: 0.10,
+        durationDays: 30,
+        iconType: 'multigym',
+        desc: 'محطة تدريب شاملة لجميع عضلات الجسم بأوزان مدمجة تصل إلى 70 كجم وكابلات فولاذية.'
+      },
+      {
+        id: 'prod-4',
+        name: 'جهاز تجديف رياضي هيدروليك',
+        price: 4000,
+        dailyRate: 0.10,
+        durationDays: 30,
+        iconType: 'rowing',
+        desc: 'تمرين متكامل للجزء العلوي والسفلي من الجسم مع شاشة تتبع الأداء الفوري.'
+      }
+    ];
+
+    // حالة التطبيق العامة
+    let state = {
+      currentUser: null,
+      isAdminAuthenticated: false,
+      products: [],
+      orders: [],
+      transactions: [],
+      wallet: {
+        number: '01098765432',
+        label: 'فودافون كاش / إنستاباي'
+      },
+      balances: {},
+      selectedProductForPay: null,
+      currentOrderIdForPay: null,
+      uploadedScreenshotDataUrl: null,
+      generatedOtp: '1234',
+      pendingPhoneLogin: '',
+      pendingRejectOrderId: null
+    };
+
+    // ==================== تهيئة التطبيق ونظام المسارات (Routing) ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      loadStateFromStorage();
+      handleRouteChange();
+      setInterval(updateAllCountdowns, 1000);
+    });
+
+    window.addEventListener('hashchange', () => {
+      loadStateFromStorage();
+      handleRouteChange();
+    });
+
+    // المزامنة اللحظية إذا تم فتح واجهة المستخدم ولوحة الأدمن في تبويبين مختلفين
+    window.addEventListener('storage', () => {
+      loadStateFromStorage();
+      renderAuthHeader();
+      renderProducts();
+      renderUserOrders();
+      renderAdminDashboard();
+      syncWalletDisplay();
+    });
+
+    function navigateTo(path) {
+      window.location.hash = path;
+      handleRouteChange();
+    }
+
+    function handleRouteChange() {
+      const hash = window.location.hash || '#/';
+      const userApp = document.getElementById('route-user-app');
+      const adminApp = document.getElementById('route-admin-app');
+
+      if (hash.startsWith('#/admin')) {
+        // عرض مسار الأدمن المستقل وإخفاء واجهة المستخدم تماماً
+        userApp.classList.add('hidden');
+        adminApp.classList.remove('hidden');
+        renderAdminGate();
+      } else {
+        // عرض واجهة المستخدم المستقلة وإخفاء لوحة الأدمن تماماً
+        adminApp.classList.add('hidden');
+        userApp.classList.remove('hidden');
+        renderAuthHeader();
+        renderProducts();
+        renderUserOrders();
+        syncWalletDisplay();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // تحميل البيانات من LocalStorage
+    function loadStateFromStorage() {
+      try {
+        const savedUser = localStorage.getItem(STORAGE_KEYS.USER);
+        state.currentUser = savedUser ? JSON.parse(savedUser) : null;
+
+        state.isAdminAuthenticated = localStorage.getItem(STORAGE_KEYS.ADMIN_SESSION) === 'true';
+
+        const savedProducts = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
+        state.products = savedProducts ? JSON.parse(savedProducts) : [...DEFAULT_PRODUCTS];
+
+        const savedWallet = localStorage.getItem(STORAGE_KEYS.WALLET);
+        if (savedWallet) state.wallet = JSON.parse(savedWallet);
+
+        const savedBalances = localStorage.getItem(STORAGE_KEYS.BALANCE_MAP);
+        if (savedBalances) state.balances = JSON.parse(savedBalances);
+
+        const savedTx = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
+        state.transactions = savedTx ? JSON.parse(savedTx) : [];
+
+        const savedOrders = localStorage.getItem(STORAGE_KEYS.ORDERS);
+        if (savedOrders) {
+          state.orders = JSON.parse(savedOrders);
+        } else {
+          // طلب تجريبي افتراضي يظهر في لوحة الأدمن عند أول تشغيل
+          state.orders = [
+            {
+              id: 'ORD-7412',
+              userPhone: '01022334455',
+              productId: 'prod-2',
+              productName: 'دراجة سبينينج رياضية X-Pro',
+              price: 3000,
+              dailyProfit: 300,
+              durationDays: 30,
+              daysPaid: 0,
+              status: 'pending',
+              rejectReason: '',
+              createdAt: Date.now() - (18 * 60 * 1000),
+              refNumber: 'VF-992831',
+              screenshot: createSampleReceiptSvgDataUrl('ORD-7412', 3000, '01022334455')
+            }
+          ];
+          saveOrders();
+        }
+      } catch (err) {
+        console.error('Error loading state:', err);
+      }
+    }
+
+    function saveOrders() {
+      localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(state.orders));
+      updateBadges();
+    }
+
+    function saveProducts() {
+      localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(state.products));
+    }
+
+    function saveBalances() {
+      localStorage.setItem(STORAGE_KEYS.BALANCE_MAP, JSON.stringify(state.balances));
+    }
+
+    function saveTransactions() {
+      localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(state.transactions));
+    }
+
+    // ==================== التنقل داخل واجهة المستخدم ====================
+    function switchUserTab(tab) {
+      const storeTab = document.getElementById('user-tab-store');
+      const ordersTab = document.getElementById('user-tab-orders');
+      const btnStore = document.getElementById('tab-btn-store');
+      const btnOrders = document.getElementById('tab-btn-orders');
+
+      if (tab === 'store') {
+        storeTab.classList.remove('hidden');
+        ordersTab.classList.add('hidden');
+        btnStore.className = 'px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-all bg-emerald-500 text-white shadow';
+        btnOrders.className = 'px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-all text-slate-300 hover:text-white flex items-center gap-1.5';
+      } else {
+        storeTab.classList.add('hidden');
+        ordersTab.classList.remove('hidden');
+        btnOrders.className = 'px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-all bg-emerald-500 text-white shadow flex items-center gap-1.5';
+        btnStore.className = 'px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap transition-all text-slate-300 hover:text-white';
+        renderUserOrders();
+      }
+    }
+
+    function scrollToProducts() {
+      document.getElementById('products-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ==================== مصادقة المستخدم برقم الموبايل (OTP AUTH) ====================
+    function renderAuthHeader() {
+      const area = document.getElementById('auth-header-area');
+      if (!area) return;
+
+      if (state.currentUser) {
+        area.innerHTML = `
+          <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-xl">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span class="text-xs font-bold text-slate-200 dir-ltr">${state.currentUser.phone}</span>
+            <button onclick="logoutUser()" class="text-[11px] text-rose-400 hover:text-rose-300 font-bold mr-1 underline">
+              خروج
+            </button>
+          </div>
+        `;
+      } else {
+        area.innerHTML = `
+          <button onclick="openAuthModal()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-xl shadow transition-all">
+            تسجيل الدخول
+          </button>
+        `;
+      }
+    }
+
+    function openAuthModal() {
+      document.getElementById('auth-step-phone').classList.remove('hidden');
+      document.getElementById('auth-step-otp').classList.add('hidden');
+      document.getElementById('login-phone-input').value = '';
+      document.getElementById('login-otp-input').value = '';
+      document.getElementById('auth-modal').classList.remove('hidden');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.add('hidden');
+    }
+
+    function resetAuthStep() {
+      document.getElementById('auth-step-phone').classList.remove('hidden');
+      document.getElementById('auth-step-otp').classList.add('hidden');
+    }
+
+    function handleSendOtp(event) {
+      event.preventDefault();
+      const phone = document.getElementById('login-phone-input').value.trim();
+      if (!/^01[0125][0-9]{8}$/.test(phone)) {
+        showToast('يرجى إدخال رقم موبايل مصري صحيح مكون من 11 رقماً', 'error');
+        return;
+      }
+
+      state.pendingPhoneLogin = phone;
+      state.generatedOtp = String(Math.floor(1000 + Math.random() * 9000));
+
+      document.getElementById('otp-phone-display').textContent = phone;
+      document.getElementById('demo-otp-code').textContent = state.generatedOtp;
+      document.getElementById('auth-step-phone').classList.add('hidden');
+      document.getElementById('auth-step-otp').classList.remove('hidden');
+      document.getElementById('login-otp-input').focus();
+      showToast(`تم إرسال رمز التحقق التجريبي: ${state.generatedOtp}`, 'info');
+    }
+
+    function handleVerifyOtp(event) {
+      event.preventDefault();
+      const entered = document.getElementById('login-otp-input').value.trim();
+      if (entered !== state.generatedOtp) {
+        showToast('رمز التحقق غير صحيح، يرجى المحاولة مرة أخرى', 'error');
+        return;
+      }
+
+      state.currentUser = {
+        phone: state.pendingPhoneLogin,
+        loggedInAt: Date.now()
+      };
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(state.currentUser));
+
+      closeAuthModal();
+      renderAuthHeader();
+      renderUserOrders();
+      showToast(`أهلاً بك! تم تسجيل الدخول برقم ${state.currentUser.phone}`, 'success');
+
+      if (state.selectedProductForPay) {
+        const prod = state.selectedProductForPay;
+        state.selectedProductForPay = null;
+        openCheckoutModal(prod.id);
+      }
+    }
+
+    function logoutUser() {
+      state.currentUser = null;
+      localStorage.removeItem(STORAGE_KEYS.USER);
+      renderAuthHeader();
+      renderUserOrders();
+      showToast('تم تسجيل الخروج من حسابك', 'info');
+    }
+
+    // ==================== عرض المنتجات ونافذة الدفع ورفع الإثبات ====================
+    function getProductIconSvg(type) {
+      switch (type) {
+        case 'bike':
+          return `<svg class="w-16 h-16 text-emerald-500" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 6a1 1 0 100-2 1 1 0 000 2zm-3 11.5V14l-3-3 4-3 2 3h2"/></svg>`;
+        case 'multigym':
+          return `<svg class="w-16 h-16 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 20h16M6 20V6a2 2 0 012-2h8a2 2 0 012 2v14M9 9h6M9 13h6M12 4v16"/></svg>`;
+        case 'rowing':
+          return `<svg class="w-16 h-16 text-sky-500" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 17h18M6 17l4-8 4 5 4-7"/></svg>`;
+        default:
+          return `<svg class="w-16 h-16 text-emerald-500" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 18h14l2-9m-4 9l-3-6H7l-3 6m14-9h2"/></svg>`;
+      }
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById('products-grid');
+      if (!grid) return;
+
+      grid.innerHTML = state.products.map(prod => {
+        const dailyAmount = Math.round(prod.price * prod.dailyRate);
+        return `
+          <div class="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group">
+            <div class="relative bg-gradient-to-br from-slate-900 to-slate-800 p-6 flex items-center justify-center h-44">
+              <div class="transform group-hover:scale-110 transition-transform duration-300">
+                ${getProductIconSvg(prod.iconType)}
+              </div>
+              <span class="absolute top-3 right-3 bg-emerald-500 text-white text-xs font-black px-3 py-1 rounded-full shadow">
+                ربح 10% يومياً
+              </span>
+              <span class="absolute bottom-3 left-3 bg-white/10 backdrop-blur text-slate-200 text-[11px] font-bold px-2.5 py-1 rounded-lg">
+                المدة: ${prod.durationDays} يوم
+              </span>
+            </div>
+
+            <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+              <div class="space-y-2">
+                <h4 class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug">${prod.name}</h4>
+                <p class="text-xs text-slate-500 leading-relaxed line-clamp-2">${prod.desc}</p>
+              </div>
+
+              <div class="space-y-3 pt-2 border-t border-slate-100">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-[11px] text-slate-400 font-bold">سعر الجهاز</p>
+                    <p class="text-xl font-black text-slate-900">${prod.price.toLocaleString()} <span class="text-xs font-bold">ج.م</span></p>
+                  </div>
+                  <div class="text-left bg-emerald-50 border border-emerald-200/80 px-3 py-1.5 rounded-xl">
+                    <p class="text-[10px] text-emerald-700 font-bold">الربح اليومي</p>
+                    <p class="text-sm font-black text-emerald-600">+${dailyAmount.toLocaleString()} ج.م</p>
+                  </div>
+                </div>
+
+                <button onclick="openCheckoutModal('${prod.id}')" class="w-full bg-slate-900 hover:bg-emerald-600 text-white font-extrabold py-3 rounded-xl transition-colors text-sm shadow-sm">
+                  شراء الآن وتفعيل الربح
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openCheckoutModal(productId) {
+      const prod = state.products.find(p => p.id === productId);
+      if (!prod) return;
+
+      if (!state.currentUser) {
+        state.selectedProductForPay = prod;
+        showToast('يرجى تسجيل الدخول برقم موبايلك أولاً لإتمام الشراء', 'info');
+        openAuthModal();
+        return;
+      }
+
+      state.selectedProductForPay = prod;
+      state.currentOrderIdForPay = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
+      state.uploadedScreenshotDataUrl = null;
+
+      const dailyAmount = Math.round(prod.price * prod.dailyRate);
+      document.getElementById('checkout-order-id').textContent = state.currentOrderIdForPay;
+      document.getElementById('checkout-product-name').textContent = prod.name;
+      document.getElementById('checkout-product-price').textContent = `${prod.price.toLocaleString()} ج.م`;
+      document.getElementById('checkout-daily-profit').textContent = `+${dailyAmount.toLocaleString()} ج.م / يوم`;
+      document.getElementById('checkout-wallet-number').textContent = state.wallet.number;
+      document.getElementById('checkout-wallet-label').textContent = state.wallet.label;
+      document.getElementById('checkout-ref-number').value = '';
+      document.getElementById('screenshot-file-input').value = '';
+
+      document.getElementById('upload-placeholder').classList.remove('hidden');
+      document.getElementById('upload-preview-wrapper').classList.add('hidden');
+      document.getElementById('checkout-modal').classList.remove('hidden');
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkout-modal').classList.add('hidden');
+      state.selectedProductForPay = null;
+    }
+
+    function copyWalletNumber() {
+      const num = state.wallet.number;
+      const tempInput = document.createElement('input');
+      tempInput.value = num;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+      showToast(`تم نسخ رقم المحفظة: ${num}`, 'success');
+    }
+
+    function handleScreenshotUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        state.uploadedScreenshotDataUrl = e.target.result;
+        document.getElementById('screenshot-preview-img').src = state.uploadedScreenshotDataUrl;
+        document.getElementById('upload-placeholder').classList.add('hidden');
+        document.getElementById('upload-preview-wrapper').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function createSampleReceiptSvgDataUrl(orderId, amount, senderPhone) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="420" height="260" viewBox="0 0 420 260">
+        <rect width="420" height="260" rx="16" fill="#0f172a"/>
+        <rect x="20" y="20" width="380" height="220" rx="12" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+        <text x="210" y="60" fill="#10b981" font-family="sans-serif" font-size="18" font-weight="bold" text-anchor="middle">إيصال تحويل إلكتروني ناجح</text>
+        <text x="210" y="105" fill="#ffffff" font-family="sans-serif" font-size="24" font-weight="bold" text-anchor="middle">${amount} EGP</text>
+        <text x="210" y="145" fill="#94a3b8" font-family="sans-serif" font-size="13" text-anchor="middle">رقم الطلب: ${orderId}</text>
+        <text x="210" y="175" fill="#94a3b8" font-family="sans-serif" font-size="13" text-anchor="middle">المرسل: ${senderPhone}</text>
+        <text x="210" y="210" fill="#34d399" font-family="sans-serif" font-size="12" text-anchor="middle">تمت العملية بنجاح - جاهز للمراجعة</text>
+      </svg>`;
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    }
+
+    function useDemoReceiptImage() {
+      if (!state.selectedProductForPay || !state.currentUser) return;
+      state.uploadedScreenshotDataUrl = createSampleReceiptSvgDataUrl(
+        state.currentOrderIdForPay,
+        state.selectedProductForPay.price,
+        state.currentUser.phone
+      );
+      document.getElementById('screenshot-preview-img').src = state.uploadedScreenshotDataUrl;
+      document.getElementById('upload-placeholder').classList.add('hidden');
+      document.getElementById('upload-preview-wrapper').classList.remove('hidden');
+      document.getElementById('checkout-ref-number').value = 'TRX-' + Math.floor(100000 + Math.random() * 900000);
+      showToast('تم إرفاق صورة إيصال تجريبية جاهزة', 'info');
+    }
+
+    function handleConfirmPurchase(event) {
+      event.preventDefault();
+      if (!state.currentUser || !state.selectedProductForPay) return;
+
+      if (!state.uploadedScreenshotDataUrl) {
+        showToast('يرجى رفع صورة لقطة الشاشة (Screenshot) للتحويل أولاً', 'error');
+        return;
+      }
+
+      const prod = state.selectedProductForPay;
+      const refNum = document.getElementById('checkout-ref-number').value.trim() || ('REF-' + Math.floor(10000 + Math.random() * 90000));
+
+      const newOrder = {
+        id: state.currentOrderIdForPay,
+        userPhone: state.currentUser.phone,
+        productId: prod.id,
+        productName: prod.name,
+        price: prod.price,
+        dailyProfit: Math.round(prod.price * prod.dailyRate),
+        durationDays: prod.durationDays,
+        daysPaid: 0,
+        status: 'pending',
+        rejectReason: '',
+        createdAt: Date.now(),
+        refNumber: refNum,
+        screenshot: state.uploadedScreenshotDataUrl
+      };
+
+      state.orders.unshift(newOrder);
+      saveOrders();
+      closeCheckoutModal();
+      switchUserTab('orders');
+      showToast('تم إرسال طلبك وإيصال التحويل بنجاح! جاري المراجعة خلال 3 ساعات.', 'success');
+    }
+
+    // ==================== صفحة "طلباتي وأرباحي" وسجل المعاملات للمستخدم ====================
+    function renderUserOrders() {
+      const container = document.getElementById('user-orders-list');
+      const txSection = document.getElementById('user-transactions-section');
+      const txList = document.getElementById('user-transactions-list');
+      updateBadges();
+
+      if (!state.currentUser) {
+        document.getElementById('stat-user-balance').textContent = '0';
+        document.getElementById('stat-user-daily').textContent = '0';
+        document.getElementById('stat-user-active-count').textContent = '0';
+        document.getElementById('stat-user-pending-text').textContent = 'سجّل الدخول لعرض طلباتك';
+        txSection.classList.add('hidden');
+
+        container.innerHTML = `
+          <div class="bg-white rounded-3xl border border-slate-200 p-10 text-center space-y-4">
+            <div class="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <h4 class="text-lg font-extrabold text-slate-800">لم تقم بتسجيل الدخول بعد</h4>
+            <p class="text-sm text-slate-500 max-w-md mx-auto">سجّل الدخول برقم موبايلك لمتابعة حالة مراجعة تحويلاتك وأرباحك اليومية.</p>
+            <button onclick="openAuthModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm">
+              تسجيل الدخول الآن
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const myOrders = state.orders.filter(o => o.userPhone === state.currentUser.phone);
+      const activeOrders = myOrders.filter(o => o.status === 'active');
+      const pendingOrders = myOrders.filter(o => o.status === 'pending');
+
+      const currentBalance = state.balances[state.currentUser.phone] || 0;
+      const dailyExpected = activeOrders.reduce((sum, o) => sum + o.dailyProfit, 0);
+
+      document.getElementById('stat-user-balance').textContent = currentBalance.toLocaleString();
+      document.getElementById('stat-user-daily').textContent = dailyExpected.toLocaleString();
+      document.getElementById('stat-user-active-count').textContent = activeOrders.length;
+      document.getElementById('stat-user-pending-text').textContent = `${pendingOrders.length} طلبات قيد المراجعة`;
+
+      if (myOrders.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-3xl border border-slate-200 p-10 text-center space-y-4">
+            <h4 class="text-lg font-extrabold text-slate-800">لا توجد لديك طلبات شراء حتى الآن</h4>
+            <p class="text-sm text-slate-500">تصفح الأجهزة الرياضية في المتجر وابدأ بتحقيق عائد يومي 10%.</p>
+            <button onclick="switchUserTab('store')" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-2.5 rounded-xl text-sm">
+              الذهاب للمتجر
+            </button>
+          </div>
+        `;
+      } else {
+        container.innerHTML = myOrders.map(order => {
+          let statusBadge = '';
+          let extraBanner = '';
+
+          if (order.status === 'pending') {
+            statusBadge = `<span class="bg-amber-100 text-amber-800 border border-amber-200 text-xs font-extrabold px-3 py-1 rounded-full">⏳ قيد المراجعة</span>`;
+            extraBanner = `
+              <div class="bg-amber-50 border border-amber-200/80 rounded-xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span class="text-amber-900 font-semibold">الوقت المتبقي للمراجعة والموافقة (مهلة 3 ساعات):</span>
+                <span class="font-black text-amber-700 dir-ltr bg-white px-2.5 py-1 rounded-lg border border-amber-200 countdown-timer" data-created="${order.createdAt}">
+                  ${formatRemainingTime(order.createdAt)}
+                </span>
+              </div>
+            `;
+          } else if (order.status === 'active') {
+            statusBadge = `<span class="bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-extrabold px-3 py-1 rounded-full">✅ مقبول / نشط</span>`;
+            extraBanner = `
+              <div class="bg-emerald-50 border border-emerald-200/80 rounded-xl p-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span class="text-emerald-900 font-semibold">الأيام المحتسبة: <strong>${order.daysPaid}</strong> من ${order.durationDays} يوم</span>
+                <span class="font-extrabold text-emerald-700">إجمالي ما حققه الجهاز: ${(order.daysPaid * order.dailyProfit).toLocaleString()} ج.م</span>
+              </div>
+            `;
+          } else {
+            statusBadge = `<span class="bg-rose-100 text-rose-800 border border-rose-200 text-xs font-extrabold px-3 py-1 rounded-full">✕ مرفوض</span>`;
+            extraBanner = `
+              <div class="bg-rose-50 border border-rose-200/80 rounded-xl p-3 text-xs text-rose-800">
+                <strong>سبب الرفض:</strong> ${order.rejectReason || 'عدم مطابقة بيانات إيصال التحويل. يرجى التواصل مع الدعم أو إعادة المحاولة.'}
+              </div>
+            `;
+          }
+
+          return `
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-400">#${order.id}</span>
+                    ${statusBadge}
+                  </div>
+                  <h4 class="text-base sm:text-lg font-extrabold text-slate-900 mt-1">${order.productName}</h4>
+                  <p class="text-xs text-slate-500">تاريخ الطلب: ${new Date(order.createdAt).toLocaleString('ar-EG')}</p>
+                </div>
+                <div class="text-left">
+                  <p class="text-xs text-slate-500">قيمة الجهاز</p>
+                  <p class="text-lg font-black text-slate-900">${order.price.toLocaleString()} ج.م</p>
+                  <p class="text-xs font-bold text-emerald-600">+${order.dailyProfit.toLocaleString()} ج.م / يوم</p>
+                </div>
+              </div>
+              ${extraBanner}
+            </div>
+          `;
+        }).join('');
+      }
+
+      // عرض سجل المعاملات والأرباح للمستخدم الحالي
+      const myTx = state.transactions.filter(t => t.userPhone === state.currentUser.phone);
+      if (myTx.length > 0) {
+        txSection.classList.remove('hidden');
+        txList.innerHTML = myTx.map(tx => `
+          <div class="p-4 flex items-center justify-between gap-3 text-xs sm:text-sm">
+            <div>
+              <p class="font-bold text-slate-800">${tx.title}</p>
+              <p class="text-[11px] text-slate-400">${new Date(tx.createdAt).toLocaleString('ar-EG')}</p>
+            </div>
+            <span class="font-black ${tx.type === 'profit' ? 'text-emerald-600' : 'text-amber-600'}">
+              ${tx.type === 'profit' ? '+' : '-'}${tx.amount.toLocaleString()} ج.م
+            </span>
+          </div>
+        `).join('');
+      } else {
+        txSection.classList.add('hidden');
+      }
+    }
+
+    // زر محاكاة مرور يوم لإضافة ربح 10% للطلبات النشطة
+    function simulateDayPassed() {
+      if (!state.currentUser) {
+        showToast('يرجى تسجيل الدخول أولاً لتجربة احتساب الأرباح', 'info');
+        openAuthModal();
+        return;
+      }
+
+      const activeOrders = state.orders.filter(
+        o => o.userPhone === state.currentUser.phone && o.status === 'active' && o.daysPaid < o.durationDays
+      );
+
+      if (activeOrders.length === 0) {
+        showToast('لا توجد لديك أجهزة نشطة حالياً. قم بشراء جهاز واعتمد الطلب من لوحة الأدمن أولاً!', 'error');
+        return;
+      }
+
+      let addedProfit = 0;
+      activeOrders.forEach(order => {
+        order.daysPaid += 1;
+        addedProfit += order.dailyProfit;
+      });
+
+      state.balances[state.currentUser.phone] = (state.balances[state.currentUser.phone] || 0) + addedProfit;
+      state.transactions.unshift({
+        id: 'TX-' + Date.now(),
+        userPhone: state.currentUser.phone,
+        type: 'profit',
+        title: `أرباح يومية (10%) لعدد ${activeOrders.length} جهاز نشط`,
+        amount: addedProfit,
+        createdAt: Date.now()
+      });
+
+      saveOrders();
+      saveBalances();
+      saveTransactions();
+      renderUserOrders();
+
+      showToast(`🎉 تم إضافة أرباح يوم جديد بقيمة +${addedProfit.toLocaleString()} ج.م إلى رصيدك!`, 'success');
+    }
+
+    function requestWithdrawDemo() {
+      if (!state.currentUser) {
+        openAuthModal();
+        return;
+      }
+      const bal = state.balances[state.currentUser.phone] || 0;
+      if (bal <= 0) {
+        showToast('رصيدك القابل للسحب 0 ج.م حالياً', 'error');
+        return;
+      }
+
+      state.transactions.unshift({
+        id: 'TX-' + Date.now(),
+        userPhone: state.currentUser.phone,
+        type: 'withdraw',
+        title: `سحب أرباح إلى رقم ${state.currentUser.phone}`,
+        amount: bal,
+        createdAt: Date.now()
+      });
+
+      state.balances[state.currentUser.phone] = 0;
+      saveBalances();
+      saveTransactions();
+      renderUserOrders();
+      showToast(`تم إرسال طلب سحب مبلغ ${bal.toLocaleString()} ج.م إلى رقمك ${state.currentUser.phone} بنجاح!`, 'success');
+    }
+
+    // ==================== مصادقة وإدارة لوحة الأدمن المستقلة (#/admin) ====================
+    function renderAdminGate() {
+      const loginScreen = document.getElementById('admin-login-screen');
+      const dashboardContent = document.getElementById('admin-dashboard-content');
+      const logoutBtn = document.getElementById('admin-logout-btn');
+
+      if (state.isAdminAuthenticated) {
+        loginScreen.classList.add('hidden');
+        dashboardContent.classList.remove('hidden');
+        logoutBtn.classList.remove('hidden');
+        renderAdminDashboard();
+      } else {
+        loginScreen.classList.remove('hidden');
+        dashboardContent.classList.add('hidden');
+        logoutBtn.classList.add('hidden');
+      }
+    }
+
+    function handleAdminLogin(event) {
+      event.preventDefault();
+      const user = document.getElementById('admin-login-user').value.trim();
+      const pass = document.getElementById('admin-login-pass').value.trim();
+
+      if (user === ADMIN_CREDENTIALS.username && pass === ADMIN_CREDENTIALS.password) {
+        state.isAdminAuthenticated = true;
+        localStorage.setItem(STORAGE_KEYS.ADMIN_SESSION, 'true');
+        renderAdminGate();
+        showToast('تم تسجيل الدخول إلى لوحة الإدارة بنجاح', 'success');
+      } else {
+        showToast('بيانات الدخول الإدارية غير صحيحة', 'error');
+      }
+    }
+
+    function logoutAdmin() {
+      state.isAdminAuthenticated = false;
+      localStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION);
+      renderAdminGate();
+      showToast('تم تسجيل خروج الإدارة', 'info');
+    }
+
+    function renderAdminDashboard() {
+      if (!state.isAdminAuthenticated) return;
+      syncWalletDisplay();
+      renderAdminOrders();
+      renderAdminProductsList();
+    }
+
+    function renderAdminOrders() {
+      const container = document.getElementById('admin-orders-container');
+      const filterEl = document.getElementById('admin-filter-status');
+      if (!container || !filterEl) return;
+      const filter = filterEl.value;
+
+      const totalApprovedAmount = state.orders
+        .filter(o => o.status === 'active')
+        .reduce((sum, o) => sum + o.price, 0);
+      const pendingCount = state.orders.filter(o => o.status === 'pending').length;
+
+      // حساب إجمالي الأرباح اليومية الموزعة على جميع الطلبات النشطة
+      const totalDistributedProfits = state.orders
+        .filter(o => o.status === 'active')
+        .reduce((sum, o) => sum + (o.daysPaid * o.dailyProfit), 0);
+
+      // حساب عدد المستخدمين الفريدين
+      const uniquePhones = new Set(state.orders.map(o => o.userPhone));
+      if (state.currentUser) uniquePhones.add(state.currentUser.phone);
+
+      document.getElementById('admin-stat-total').textContent = totalApprovedAmount.toLocaleString();
+      document.getElementById('admin-stat-pending').textContent = pendingCount;
+      document.getElementById('admin-stat-distributed').textContent = totalDistributedProfits.toLocaleString();
+      document.getElementById('admin-stat-users').textContent = uniquePhones.size;
+
+      const filteredOrders = filter === 'all'
+        ? state.orders
+        : state.orders.filter(o => o.status === filter);
+
+      if (filteredOrders.length === 0) {
+        container.innerHTML = `
+          <div class="p-10 text-center text-sm text-slate-400">
+            لا توجد طلبات مطابقة للتصفية الحالية.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filteredOrders.map(order => {
+        let statusTag = '';
+        if (order.status === 'pending') {
+          statusTag = `<span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-extrabold px-2.5 py-1 rounded-full">⏳ بانتظار المراجعة</span>`;
+        } else if (order.status === 'active') {
+          statusTag = `<span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-extrabold px-2.5 py-1 rounded-full">✅ مقبول ونشط</span>`;
+        } else {
+          statusTag = `<span class="bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-extrabold px-2.5 py-1 rounded-full">✕ مرفوض</span>`;
+        }
+
+        return `
+          <div class="p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-5 hover:bg-slate-800/40 transition-colors">
+            
+            <!-- بيانات العميل والطلب -->
+            <div class="space-y-2 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-black text-white text-sm">#${order.id}</span>
+                ${statusTag}
+                ${order.status === 'pending' ? `
+                  <span class="text-xs font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30 px-2.5 py-0.5 rounded-lg dir-ltr countdown-timer" data-created="${order.createdAt}">
+                    ${formatRemainingTime(order.createdAt)}
+                  </span>
+                ` : ''}
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-xs text-slate-300 pt-1">
+                <p>📱 رقم العميل: <strong class="text-white dir-ltr">${order.userPhone}</strong></p>
+                <p>🏋️ الجهاز: <strong class="text-white">${order.productName}</strong></p>
+                <p>💰 المبلغ المحوّل: <strong class="text-emerald-400 text-sm">${order.price.toLocaleString()} ج.م</strong></p>
+                <p>🔖 رقم المرجع: <strong class="text-slate-200">${order.refNumber}</strong></p>
+              </div>
+              ${order.status === 'rejected' && order.rejectReason ? `
+                <p class="text-xs text-rose-400 pt-1">سبب الرفض: ${order.rejectReason}</p>
+              ` : ''}
+            </div>
+
+            <!-- معاينة الإيصال وأزرار القرار -->
+            <div class="flex flex-wrap items-center gap-3">
+              <button onclick="openImageModal('${order.id}')" class="group relative w-20 h-16 rounded-xl overflow-hidden border border-slate-700 bg-slate-950 shrink-0 shadow-sm" title="تكبير صورة التحويل">
+                <img src="${order.screenshot}" alt="إيصال" class="w-full h-full object-cover group-hover:opacity-80 transition-opacity" />
+                <span class="absolute inset-0 flex items-center justify-center bg-black/50 text-white text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                  معاينة
+                </span>
+              </button>
+
+              ${order.status === 'pending' ? `
+                <div class="flex items-center gap-2">
+                  <button onclick="adminApproveOrder('${order.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow-sm transition-all">
+                    ✓ موافقة وتفعيل الربح
+                  </button>
+                  <button onclick="openRejectModal('${order.id}')" class="bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-bold px-3.5 py-2.5 rounded-xl transition-all">
+                    ✕ رفض
+                  </button>
+                </div>
+              ` : `
+                <button onclick="adminResetOrder('${order.id}')" class="text-xs text-slate-400 hover:text-white underline px-2">
+                  إعادة للمراجعة
+                </button>
+              `}
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    function adminApproveOrder(orderId) {
+      const order = state.orders.find(o => o.id === orderId);
+      if (!order) return;
+
+      order.status = 'active';
+      order.rejectReason = '';
+      order.approvedAt = Date.now();
+      saveOrders();
+      renderAdminOrders();
+      showToast(`تمت الموافقة على الطلب #${order.id} وتفعيل الربح اليومي (${order.dailyProfit} ج.م/يوم)!`, 'success');
+    }
+
+    function openRejectModal(orderId) {
+      state.pendingRejectOrderId = orderId;
+      document.getElementById('reject-modal-order-id').textContent = '#' + orderId;
+      document.getElementById('reject-reason-input').value = '';
+      document.getElementById('reject-modal').classList.remove('hidden');
+    }
+
+    function closeRejectModal() {
+      state.pendingRejectOrderId = null;
+      document.getElementById('reject-modal').classList.add('hidden');
+    }
+
+    function confirmRejectOrder() {
+      if (!state.pendingRejectOrderId) return;
+      const order = state.orders.find(o => o.id === state.pendingRejectOrderId);
+      if (!order) return;
+
+      const reason = document.getElementById('reject-reason-input').value.trim();
+      order.status = 'rejected';
+      order.rejectReason = reason || 'يرجى التحقق من صورة التحويل والمبلغ المحوّل وإعادة المحاولة.';
+      saveOrders();
+      closeRejectModal();
+      renderAdminOrders();
+      showToast(`تم رفض الطلب #${order.id}`, 'info');
+    }
+
+    function adminResetOrder(orderId) {
+      const order = state.orders.find(o => o.id === orderId);
+      if (!order) return;
+      order.status = 'pending';
+      order.rejectReason = '';
+      saveOrders();
+      renderAdminOrders();
+    }
+
+    // حفظ إعدادات محفظة الاستلام من الأدمن
+    function syncWalletDisplay() {
+      const bannerEl = document.getElementById('display-wallet-banner');
+      if (bannerEl) bannerEl.textContent = state.wallet.number;
+
+      const adminNumEl = document.getElementById('admin-wallet-number');
+      const adminLblEl = document.getElementById('admin-wallet-label');
+      if (adminNumEl) adminNumEl.value = state.wallet.number;
+      if (adminLblEl) adminLblEl.value = state.wallet.label;
+    }
+
+    function saveWalletSettings() {
+      const num = document.getElementById('admin-wallet-number').value.trim();
+      const lbl = document.getElementById('admin-wallet-label').value.trim();
+
+      if (!num) {
+        showToast('يرجى إدخال رقم المحفظة', 'error');
+        return;
+      }
+
+      state.wallet.number = num;
+      state.wallet.label = lbl || 'محفظة إلكترونية';
+      localStorage.setItem(STORAGE_KEYS.WALLET, JSON.stringify(state.wallet));
+      syncWalletDisplay();
+      showToast('تم تحديث رقم محفظة الاستلام بنجاح وسينعكس فوراً للمستخدمين', 'success');
+    }
+
+    // إدارة الأجهزة الرياضية في لوحة الأدمن (إضافة / تعديل / حذف)
+    function renderAdminProductsList() {
+      const listEl = document.getElementById('admin-products-list');
+      const countEl = document.getElementById('admin-products-count');
+      if (!listEl || !countEl) return;
+
+      countEl.textContent = state.products.length;
+      listEl.innerHTML = state.products.map(prod => `
+        <div class="p-3.5 flex items-center justify-between gap-3 text-xs">
+          <div>
+            <p class="font-bold text-white">${prod.name}</p>
+            <p class="text-slate-400">السعر: <strong class="text-emerald-400">${prod.price.toLocaleString()} ج.م</strong> • الربح: ${Math.round(prod.price * prod.dailyRate).toLocaleString()} ج.م/يوم (${prod.durationDays} يوم)</p>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button type="button" onclick="startEditProduct('${prod.id}')" class="bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold px-2.5 py-1.5 rounded-lg">
+              تعديل
+            </button>
+            <button type="button" onclick="deleteProduct('${prod.id}')" class="bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 font-bold px-2.5 py-1.5 rounded-lg">
+              حذف
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function startEditProduct(productId) {
+      const prod = state.products.find(p => p.id === productId);
+      if (!prod) return;
+
+      document.getElementById('edit-prod-id').value = prod.id;
+      document.getElementById('new-prod-name').value = prod.name;
+      document.getElementById('new-prod-price').value = prod.price;
+      document.getElementById('new-prod-days').value = prod.durationDays;
+      document.getElementById('new-prod-icon').value = prod.iconType;
+      document.getElementById('new-prod-desc').value = prod.desc;
+
+      document.getElementById('admin-product-form-title').textContent = '✏️ تعديل بيانات الجهاز الرياضي';
+      document.getElementById('admin-product-submit-btn').textContent = 'حفظ التعديلات';
+      document.getElementById('admin-cancel-edit-btn').classList.remove('hidden');
+    }
+
+    function cancelEditProduct() {
+      document.getElementById('edit-prod-id').value = '';
+      document.getElementById('new-prod-name').value = '';
+      document.getElementById('new-prod-price').value = '';
+      document.getElementById('new-prod-days').value = 30;
+      document.getElementById('new-prod-desc').value = '';
+
+      document.getElementById('admin-product-form-title').textContent = '➕ إضافة جهاز رياضي جديد';
+      document.getElementById('admin-product-submit-btn').textContent = 'إضافة الجهاز للمتجر';
+      document.getElementById('admin-cancel-edit-btn').classList.add('hidden');
+    }
+
+    function handleSaveProduct(event) {
+      event.preventDefault();
+      const editId = document.getElementById('edit-prod-id').value;
+      const name = document.getElementById('new-prod-name').value.trim();
+      const price = Number(document.getElementById('new-prod-price').value);
+      const durationDays = Number(document.getElementById('new-prod-days').value);
+      const iconType = document.getElementById('new-prod-icon').value;
+      const desc = document.getElementById('new-prod-desc').value.trim();
+
+      if (editId) {
+        const idx = state.products.findIndex(p => p.id === editId);
+        if (idx !== -1) {
+          state.products[idx] = {
+            ...state.products[idx],
+            name,
+            price,
+            durationDays,
+            iconType,
+            desc
+          };
+          showToast(`تم تحديث بيانات "${name}" بنجاح`, 'success');
+        }
+        cancelEditProduct();
+      } else {
+        state.products.push({
+          id: 'prod-' + Date.now(),
+          name,
+          price,
+          dailyRate: 0.10,
+          durationDays,
+          iconType,
+          desc
+        });
+        event.target.reset();
+        document.getElementById('new-prod-days').value = 30;
+        showToast(`تم إضافة "${name}" إلى المتجر بنجاح!`, 'success');
+      }
+
+      saveProducts();
+      renderProducts();
+      renderAdminProductsList();
+    }
+
+    function deleteProduct(productId) {
+      if (state.products.length <= 1) {
+        showToast('يجب الإبقاء على جهاز واحد على الأقل في المتجر', 'error');
+        return;
+      }
+      state.products = state.products.filter(p => p.id !== productId);
+      saveProducts();
+      renderProducts();
+      renderAdminProductsList();
+      showToast('تم حذف الجهاز من المتجر', 'info');
+    }
+
+    // ==================== معاينة الصور والعدادات التنازلية والإشعارات ====================
+    function openImageModal(orderId) {
+      const order = state.orders.find(o => o.id === orderId);
+      if (!order) return;
+      document.getElementById('modal-full-image').src = order.screenshot;
+      document.getElementById('image-modal').classList.remove('hidden');
+    }
+
+    function closeImageModal() {
+      document.getElementById('image-modal').classList.add('hidden');
+    }
+
+    function formatRemainingTime(createdAt) {
+      const deadline = createdAt + REVIEW_DURATION_MS;
+      const diff = deadline - Date.now();
+
+      if (diff <= 0) return '00:00:00 (انتهت المهلة)';
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      const pad = n => String(n).padStart(2, '0');
+      return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    }
+
+    function updateAllCountdowns() {
+      const timers = document.querySelectorAll('.countdown-timer');
+      timers.forEach(el => {
+        const created = Number(el.getAttribute('data-created'));
+        el.textContent = formatRemainingTime(created);
+      });
+    }
+
+    function updateBadges() {
+      const userOrdersCountEl = document.getElementById('user-orders-count');
+      if (!userOrdersCountEl) return;
+      if (state.currentUser) {
+        const count = state.orders.filter(o => o.userPhone === state.currentUser.phone).length;
+        userOrdersCountEl.textContent = count;
+      } else {
+        userOrdersCountEl.textContent = '0';
+      }
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      const styles = {
+        success: 'bg-slate-900 text-white border-r-4 border-emerald-500 border border-slate-700',
+        error: 'bg-slate-900 text-white border-r-4 border-rose-500 border border-slate-700',
+        info: 'bg-slate-900 text-white border-r-4 border-amber-400 border border-slate-700'
+      };
+
+      toast.className = `${styles[type] || styles.info} px-4 py-3.5 rounded-2xl shadow-2xl text-xs sm:text-sm font-bold flex items-center justify-between gap-3 pointer-events-auto fade-in`;
+      toast.innerHTML = `
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()" class="text-slate-400 hover:text-white text-xs">✕</button>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        if (toast.parentElement) toast.remove();
+      }, 4200);
+    }
+  </script>
+</body>
+</html>
